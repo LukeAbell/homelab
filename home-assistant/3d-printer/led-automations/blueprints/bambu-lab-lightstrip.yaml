@@ -200,6 +200,24 @@ action:
                   entity_id: !input tplink_lightstrip
                 alias: Turn on TP-Link lightstrip to yellow
         alias: Do we need to set color to yellow?
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: !input printer_stage
+                state: printing
+            sequence:
+              - service: light.turn_on
+                data:
+                  rgb_color:
+                    - 0
+                    - 255
+                    - 255
+                  brightness: 255
+                  effect: Solid
+                target:
+                  entity_id: !input tplink_lightstrip
+                alias: Turn on TP-Link lightstrip to cyan
+        alias: Do we need to set color to cyan?
     else:
       - service: light.turn_off
         data: {}
