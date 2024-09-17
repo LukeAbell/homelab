@@ -59,11 +59,15 @@ action:
   - service: logbook.log
     data:
       name: "TP-Link Lightstrip Automation"
-      message: "Triggered with status: {{ states('!input printer_status') }}, stage: {{ states('!input printer_stage') }}, progress: {{ states('!input printer_progress') }}"
+      message: "Triggered with status: {{ states('sensor.skywalker_3d_printer_print_status') }}, stage: {{ states('sensor.skywalker_3d_printer_current_stage') }}, progress: {{ states('sensor.skywalker_3d_printer_print_progress') }}"
   - variables:
-      progress: "{{ states('!input printer_progress') | int(0) }}"
+      progress: "{{ states('sensor.skywalker_3d_printer_print_progress') | int(0) }}"
       blue_to_green: "{{ (255 * progress / 100) | int }}"
-      color: "[0, {{ blue_to_green }}, {{ 255 - blue_to_green }}]"
+      color: [0, {{ blue_to_green }}, {{ 255 - blue_to_green }}]
+  - service: logbook.log
+    data:
+      name: "TP-Link Lightstrip Progress"
+      message: "Calculated progress: {{ progress }}, color: {{ color }}"
   - if:
       - condition: state
         state: "on"
