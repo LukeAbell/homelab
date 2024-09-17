@@ -1,6 +1,6 @@
 blueprint:
-  name: Bambu Lab Tapo Lightstrip Controller
-  description: Control one or more Tapo light strips with Bambu 3D printer
+  name: Bambu Lab TP-Link Lightstrip Controller
+  description: Control one or more TP-Link light strips with Bambu 3D printer
   domain: automation
   source_url: https://github.com/greghesp/ha-bambulab/blob/main/blueprints/wled_controller.yaml
   input:
@@ -28,16 +28,15 @@ blueprint:
           filter:
             domain: light
             integration: bambu_lab
-    tapo_lightstrip:
-      name: Tapo Lightstrip
-      description: "Select the Tapo light strip you wish to control."
+    tplink_lightstrip:
+      name: TP-Link Lightstrip
+      description: "Select the TP-Link light strip you wish to control."
       selector:
         entity:
-          filter:
-            domain: light
-            integration: tplink
+          domain: light
+          integration: tplink
 
-alias: Bambu Lab Tapo Lightstrip Controller
+alias: Bambu Lab TP-Link Lightstrip Controller
 description: ""
 trigger:
   - platform: state
@@ -84,9 +83,9 @@ action:
             - 255
             - 255
           brightness_pct: 100
-        alias: Turn Tapo lightstrip on white
+        alias: Turn TP-Link lightstrip on white
         target:
-          entity_id: !input tapo_lightstrip
+          entity_id: !input tplink_lightstrip
       - choose:
           - conditions:
               - condition: or
@@ -113,8 +112,8 @@ action:
                   brightness: 255
                   effect: Blink
                 target:
-                  entity_id: !input tapo_lightstrip
-                alias: Turn on Tapo lightstrip to red
+                  entity_id: !input tplink_lightstrip
+                alias: Turn on TP-Link lightstrip to red
         alias: Do we need to set color to red?
       - choose:
           - conditions:
@@ -139,8 +138,8 @@ action:
                   brightness: 255
                   effect: Solid
                 target:
-                  entity_id: !input tapo_lightstrip
-                alias: Turn on Tapo lightstrip to green
+                  entity_id: !input tplink_lightstrip
+                alias: Turn on TP-Link lightstrip to green
               - delay:
                   hours: 0
                   minutes: 5
@@ -155,8 +154,8 @@ action:
                   brightness: 255
                   effect: Solid
                 target:
-                  entity_id: !input tapo_lightstrip
-                alias: Turn on Tapo lightstrip to white
+                  entity_id: !input tplink_lightstrip
+                alias: Turn on TP-Link lightstrip to white
         alias: Do we need to set color to green?
       - choose:
           - conditions:
@@ -175,8 +174,8 @@ action:
                   brightness: 255
                   effect: Blink
                 target:
-                  entity_id: !input tapo_lightstrip
-                alias: Turn on Tapo lightstrip to blue
+                  entity_id: !input tplink_lightstrip
+                alias: Turn on TP-Link lightstrip to blue
         alias: Do we need to set color to blue?
       - choose:
           - conditions:
@@ -198,13 +197,13 @@ action:
                   brightness: 255
                   effect: Blink
                 target:
-                  entity_id: !input tapo_lightstrip
-                alias: Turn on Tapo lightstrip to yellow
+                  entity_id: !input tplink_lightstrip
+                alias: Turn on TP-Link lightstrip to yellow
         alias: Do we need to set color to yellow?
     else:
       - service: light.turn_off
         data: {}
         target:
-          entity_id: !input tapo_lightstrip
-        alias: Turn Tapo lightstrip off
+          entity_id: !input tplink_lightstrip
+        alias: Turn TP-Link lightstrip off
 mode: single
