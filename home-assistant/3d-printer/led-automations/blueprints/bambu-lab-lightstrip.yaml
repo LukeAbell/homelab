@@ -61,7 +61,7 @@ action:
       name: "TP-Link Lightstrip Automation"
       message: "Triggered with status: {{ states('!input printer_status') }}, stage: {{ states('!input printer_stage') }}, progress: {{ states('!input printer_progress') }}"
   - variables:
-      progress: "{{ states('!input printer_progress') | int }}"
+      progress: "{{ states('!input printer_progress') | int(0) }}"
       blue_to_green: "{{ (255 * progress / 100) | int }}"
       color: "[0, {{ blue_to_green }}, {{ 255 - blue_to_green }}]"
   - if:
