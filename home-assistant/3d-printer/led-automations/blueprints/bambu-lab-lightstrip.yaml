@@ -56,10 +56,14 @@ trigger:
     alias: When printer stage, status, chamber light state, or print progress changes
 condition: []
 action:
+  - service: logbook.log
+    data:
+      name: "TP-Link Lightstrip Automation"
+      message: "Triggered with status: {{ states('!input printer_status') }}, stage: {{ states('!input printer_stage') }}, progress: {{ states('!input printer_progress') }}"
   - variables:
       progress: "{{ states('!input printer_progress') | int }}"
       blue_to_green: "{{ (255 * progress / 100) | int }}"
-      color: "[{{ 0 }}, {{ blue_to_green }}, {{ 255 - blue_to_green }}]"
+      color: "[0, {{ blue_to_green }}, {{ 255 - blue_to_green }}]"
   - if:
       - condition: state
         state: "on"
@@ -219,6 +223,10 @@ action:
                 entity_id: !input printer_stage
                 state: printing
             sequence:
+              - service: logbook.log
+                data:
+                  name: "TP-Link Lightstrip Color"
+                  message: "Setting color to {{ color }} based on progress {{ progress }}"
               - service: light.turn_on
                 data_template:
                   rgb_color: "{{ color }}"
