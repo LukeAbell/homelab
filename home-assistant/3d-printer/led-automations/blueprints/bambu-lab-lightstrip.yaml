@@ -1,6 +1,6 @@
 blueprint:
-  name: Bambu Lab TP-Link Lightstrip Controller with Progress Bar
-  description: Control a TP-Link light strip with Bambu 3D printer, including a progress bar effect
+  name: Bambu Lab TP-Link Lightstrip Controller
+  description: Control one or more TP-Link light strips with Bambu 3D printer
   domain: automation
   source_url: https://github.com/greghesp/ha-bambulab/blob/main/blueprints/wled_controller.yaml
   input:
@@ -15,14 +15,6 @@ blueprint:
     printer_stage:
       name: Current Stage of your Bambu Lab Printer
       description: "Select the printer current stage entity."
-      selector:
-        entity:
-          filter:
-            domain: sensor
-            integration: bambu_lab
-    printer_progress:
-      name: Print Progress of your Bambu Lab Printer
-      description: "Select the print progress entity."
       selector:
         entity:
           filter:
@@ -44,7 +36,7 @@ blueprint:
           domain: light
           integration: tplink
 
-alias: Bambu Lab TP-Link Lightstrip Controller with Progress Bar
+alias: Bambu Lab TP-Link Lightstrip Controller
 description: ""
 trigger:
   - platform: state
@@ -52,17 +44,9 @@ trigger:
       - !input chamber_light
       - !input printer_status
       - !input printer_stage
-      - !input printer_progress
-    alias: When printer stage, status, chamber light state, or print progress changes
+    alias: When printer stage, status or chamber light state changes
 condition: []
 action:
-  - variables:
-      progress: "{{ states('!input printer_progress') | int }}"
-      total_zones: 50  # Number of addressable zones in the light strip
-      zones_on: "{{ (total_zones * progress / 100) | int }}"
-      zones_off: "{{ total_zones - zones_on }}"
-      color_on: [0, 255, 0]  # Green color for progress
-      color_off: [0, 0, 0]  # Off color for remaining zones
   - if:
       - condition: state
         state: "on"
@@ -216,24 +200,6 @@ action:
                   entity_id: !input tplink_lightstrip
                 alias: Turn on TP-Link lightstrip to yellow
         alias: Do we need to set color to yellow?
-      - service: light.turn_on
-        data_template:
-          entity_id: !input tplink_lightstrip
-          brightness: 255
-          effect: >
-            {% set progress = states('!input printer_progress') | int %}
-            {% set total_zones = 50 %}
-            {% set zones_on = (total_zones * progress / 100) | int %}
-            {% set zones_off = total_zones - zones_on %}
-            {% set color_on = [0, 255, 0] %}
-            {% set color_off = [0, 0, 0] %}
-            {{
-              [
-                {"transition": 0, "color": color_on, "count": zones_on},
-                {"transition": 0, "color": color_off, "count": zones_off}
-              ]
-            }}
-        alias: Update TP-Link lightstrip progress bar
     else:
       - service: light.turn_off
         data: {}
