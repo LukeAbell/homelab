@@ -35,7 +35,7 @@ blueprint:
         entity:
           filter:
             domain: light
-            integration: tapo
+            integration: tplink
 
 alias: Bambu Lab Tapo Lightstrip Controller
 description: ""
