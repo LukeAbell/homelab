@@ -1,6 +1,6 @@
 blueprint:
-  name: Bambu Lab TP-Link Lightstrip Controller
-  description: Control one or more TP-Link light strips with Bambu 3D printer
+  name: Bambu Lab TP-Link Lightstrip Controller with Progress-Based Color
+  description: Control one or more TP-Link light strips with Bambu 3D printer, including progress-based color change
   domain: automation
   source_url: https://github.com/greghesp/ha-bambulab/blob/main/blueprints/wled_controller.yaml
   input:
@@ -15,6 +15,14 @@ blueprint:
     printer_stage:
       name: Current Stage of your Bambu Lab Printer
       description: "Select the printer current stage entity."
+      selector:
+        entity:
+          filter:
+            domain: sensor
+            integration: bambu_lab
+    printer_progress:
+      name: Print Progress of your Bambu Lab Printer
+      description: "Select the print progress entity."
       selector:
         entity:
           filter:
@@ -36,7 +44,7 @@ blueprint:
           domain: light
           integration: tplink
 
-alias: Bambu Lab TP-Link Lightstrip Controller
+alias: Bambu Lab TP-Link Lightstrip Controller with Progress-Based Color
 description: ""
 trigger:
   - platform: state
@@ -44,9 +52,14 @@ trigger:
       - !input chamber_light
       - !input printer_status
       - !input printer_stage
-    alias: When printer stage, status or chamber light state changes
+      - !input printer_progress
+    alias: When printer stage, status, chamber light state, or print progress changes
 condition: []
 action:
+  - variables:
+      progress: "{{ states('!input printer_progress') | int }}"
+      blue_to_green: "{{ (255 * progress / 100) | int }}"
+      color: "[{{ 0 }}, {{ blue_to_green }}, {{ 255 - blue_to_green }}]"
   - if:
       - condition: state
         state: "on"
@@ -107,14 +120,14 @@ action:
                 data:
                   rgb_color:
                     - 255
-                    - 0
+                    - 169
                     - 0
                   brightness: 255
                   effect: Blink
                 target:
                   entity_id: !input tplink_lightstrip
-                alias: Turn on TP-Link lightstrip to red
-        alias: Do we need to set color to red?
+                alias: Turn on TP-Link lightstrip to yellow (error)
+        alias: Do we need to set color to yellow?
       - choose:
           - conditions:
               - condition: or
@@ -207,17 +220,14 @@ action:
                 state: printing
             sequence:
               - service: light.turn_on
-                data:
-                  rgb_color:
-                    - 0
-                    - 255
-                    - 255
+                data_template:
+                  rgb_color: "{{ color }}"
                   brightness: 255
                   effect: Solid
                 target:
                   entity_id: !input tplink_lightstrip
-                alias: Turn on TP-Link lightstrip to cyan
-        alias: Do we need to set color to cyan?
+                alias: Turn on TP-Link lightstrip with progress-based color
+        alias: Do we need to set color based on progress?
     else:
       - service: light.turn_off
         data: {}
